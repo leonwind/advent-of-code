@@ -56,8 +56,12 @@ def _build_fields(lines, part_two=False):
                         points[(x, y1)] += 1
                     else:
                         points[(x, y1)] = 1 
-                
-    return len([k for k, v in points.items() if v >= 2]) 
+
+    num_overlaps = 0
+    for v in points.values():
+        if v >= 2: 
+            num_overlaps += 1
+    return num_overlaps
 
 
 def solve_part_one(lines):

@@ -28,12 +28,11 @@ def _run_simulation(initialal_state, num_days):
 
         states = next_states
 
-    return sum([num_fishes for _, num_fishes in states.items()])
+    return sum(states.values())
 
 
 def solve_part_one(initial_state):
     return _run_simulation(initial_state, 80)         
-
 
 
 def solve_part_two(initial_state):
