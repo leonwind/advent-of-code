@@ -17,4 +17,3 @@ if __name__ == "__main__":
 
     print(solve_part_one(input_data))
     print(solve_part_two(input_data))
-
