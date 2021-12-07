@@ -18,8 +18,7 @@ def _gauss(x):
     return x * (x + 1) // 2
 
 
-def solve_part_two(data):
-    positions.sort()
+def solve_part_two(positions):
     avg = sum(positions) / len(positions)
     return sum([_gauss(abs(x - avg)) for x in positions])
 
