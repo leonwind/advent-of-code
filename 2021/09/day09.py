@@ -1,3 +1,6 @@
+import heapq
+
+
 def read_input(filename):
     with open(filename) as f:
         content = f.readlines()
@@ -8,7 +11,7 @@ def read_input(filename):
 
 def _get_neighbors(matrix, i, j):
     neighbors = [(i + 1, j), (i - 1, j), (i, j + 1), (i, j - 1)] 
-    return [(i, j) for i, j in neighbors if i in range(len(matrix)) and j in range(len(matrix[0]))]
+    return [(i, j) for i, j in neighbors if 0 <= i < len(matrix) and 0 <= j < len(matrix[0])]
 
 
 def _get_low_points(matrix):
@@ -55,11 +58,10 @@ def solve_part_two(matrix):
                     stack.append((next_i, next_j))
 
         if len(basins) < 3:
-            basins.append(curr_basin_size)
-        else:
-            basins.sort(reverse=True)
-            curr_basin_size = max(basins.pop(), curr_basin_size)
-            basins.append(curr_basin_size)
+            heapq.heappush(basins, curr_basin_size)
+        elif curr_basin_size > basins[0]:
+            heapq.heappop(basins)
+            heapq.heappush(basins, curr_basin_size)
 
     return basins[0] * basins[1] * basins[2]
 
