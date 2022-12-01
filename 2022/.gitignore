@@ -1,0 +1,4 @@
+# Haskell
+cabal-dev
+*.o
+*.hi
