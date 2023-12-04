@@ -1,22 +1,18 @@
 use std::{fs::read_to_string, collections::BTreeSet};
 
 struct Card {
-    winning: BTreeSet<u8>,
-    have: BTreeSet<u8>
+    winning: BTreeSet<usize>,
+    have: BTreeSet<usize>
 }
 
 impl Card {
     fn count_winning(&self) -> usize {
-        self.have.iter().filter(|n| self.winning.contains(n)).count()
+        self.winning.intersection(&self.have).count()
     }
 
     fn score(&self) -> usize {
         let winning_count = self.count_winning();
-        if winning_count > 0 {
-            1 << (winning_count - 1)
-        } else {
-            0
-        }
+        if winning_count > 0 { 1 << (winning_count - 1) } else { 0 }
     }
 }
 
@@ -37,7 +33,7 @@ fn solve_part_one(lines: &Vec<String>) -> usize {
         let (winning_input, have_input) = input.split_once(" | ").unwrap();
         let winning = winning_input.split(" ").filter(|n| !n.is_empty()).map(|n| n.parse().unwrap()).collect();
         let have = have_input.split(" ").filter(|n| !n.is_empty()).map(|n| n.parse().unwrap()).collect();
-        cards.push(Card { winning, have});
+        cards.push(Card { winning, have });
     }
     
     cards.iter().map(Card::score).sum()
@@ -52,11 +48,10 @@ fn solve_part_two(lines: &Vec<String>) -> usize {
         let (winning_input, have_input) = input.split_once(" | ").unwrap();
         let winning = winning_input.split(" ").filter(|n| !n.is_empty()).map(|n| n.parse().unwrap()).collect();
         let have = have_input.split(" ").filter(|n| !n.is_empty()).map(|n| n.parse().unwrap()).collect();
-        cards.push(Card { winning, have});
+        cards.push(Card { winning, have });
     }
 
     let mut nums: Vec<usize> = vec![1; cards.len()];
-
     for (i, c) in cards.iter().enumerate() {
         let winning = c.count_winning();
 
