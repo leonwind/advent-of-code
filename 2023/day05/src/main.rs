@@ -1,5 +1,7 @@
 use std::fs::read_to_string;
 use core::ops::Range;
+use std::thread;
+use std::sync::{Arc, Mutex};
 
 #[derive(Clone)]
 struct MapEntry {
@@ -83,18 +85,17 @@ fn solve_part_one(lines: &Vec<String>) -> usize {
             seed = map.apply(seed);
         }
 
-        min_location = if seed < min_location {seed} else {min_location}
+        min_location = min_location.min(seed);
     }
 
     min_location
 }
 
-
 fn solve_part_two(lines: &Vec<String>) -> usize {
     let seeds = parse_start_seeds(&lines[0]);
     let maps = parse_maps(&lines[2..]);
     
-    let mut min_location: usize = usize::MAX;
+    let mut min_location = usize::MAX;
 
     // Not really efficient but still fast enough (< 1min)
     for i in (0..seeds.len()).step_by(2) {
@@ -103,12 +104,49 @@ fn solve_part_two(lines: &Vec<String>) -> usize {
                 seed = map.apply(seed);
             }
 
-            min_location = if seed < min_location {seed} else {min_location}
+            min_location = min_location.min(seed);
         }
         println!("Finished range {i}");
     }
 
-    min_location
+    min_location 
+}
+
+
+fn solve_part_two_parallel(lines: &Vec<String>) -> usize {
+    let seeds = Arc::new(parse_start_seeds(&lines[0]));
+    let maps = Arc::new(parse_maps(&lines[2..]));
+    
+    let min_location = Arc::new(Mutex::new(usize::MAX));
+
+    let threads: Vec<_> = (0..seeds.len()).step_by(2)
+        .map(|i| {
+            let seeds = seeds.clone();
+            let maps = maps.clone();
+            let min_location = min_location.clone();
+
+            thread::spawn(move || {
+                let mut local_min_location: usize = usize::MAX;
+                for mut seed in seeds[i]..seeds[i] + seeds[i + 1] {
+                    for map in maps.iter() {
+                        seed = map.apply(seed);
+                    }
+
+                    local_min_location = local_min_location.min(seed);
+                }
+
+                let mut guard = min_location.lock().unwrap();
+                *guard = (*guard).min(local_min_location);
+                println!("Finished range {i}");
+            })
+        })
+        .collect();
+
+    for thread in threads {
+        thread.join().unwrap();
+    }
+
+    return *min_location.lock().unwrap();
 }
 
 
@@ -119,6 +157,7 @@ fn main() {
     let part_one_res = solve_part_one(&lines);
     println!("Part 1: {part_one_res}");
 
-    let part_two_res = solve_part_two(&lines);
+    //let part_two_res = solve_part_two(&lines);
+    let part_two_res = solve_part_two_parallel(&lines);
     println!("Part 2: {part_two_res}");
 }
