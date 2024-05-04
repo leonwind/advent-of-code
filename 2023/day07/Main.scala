@@ -19,15 +19,28 @@ object Cards extends Enumeration {
 }
 
 object Day07 extends App {
-    println("Solve Day 07")
-
+    //val input = io.Source.fromFile("small_input.txt").getLines().toList
     val input = io.Source.fromFile("input.txt").getLines().toList
+
     //println(input)
 
     class Hand(val cards: List[Cards.Card], val bid: Int) {
+        val cardsWithJoker: List[Cards.Card] = cards.map {
+            case Cards.Jack => Cards.Joker
+            case other => other
+        }
 
         def count: List[Int] =
             cards.groupMapReduce(card => card)(_ => 1)(_ + _).values.toList.sorted.reverse
+
+        def countWithJoker: List[Int] = {
+            val countsWithoutJoker: List[Int] = cardsWithJoker.filter(_ != Cards.Joker).groupMapReduce(card => card)(_ => 1)(_ + _).values.toList.sorted.reverse
+
+            if (countsWithoutJoker == Nil)
+                List(5)
+            else
+                List(countsWithoutJoker.head + cardsWithJoker.filter(_ == Cards.Joker).length) ::: countsWithoutJoker.tail
+        }
     }
 
     val hands: List[Hand] = input.map {
@@ -37,9 +50,12 @@ object Day07 extends App {
     hands.map(hand => {
         //println(hand.cards)
         //println(hand.getBid)
-        //println(hand.count)
+        //println(hand.countWithJoker)
     })
 
     val part1 = hands.sortBy(hand => (hand.count, hand.cards)).map(_.bid).zipWithIndex.map((bid, idx) => {bid * (idx + 1)}).sum
     println(part1)
+
+    val part2 = hands.sortBy(hand => (hand.countWithJoker, hand.cardsWithJoker)).map(_.bid).zipWithIndex.map((bid, idx) => {bid * (idx + 1)}).sum
+    println(part2)
 }
