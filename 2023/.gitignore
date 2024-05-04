@@ -1,3 +1,8 @@
+# Rust
 debug/
 target/
 Cargo.lock
+
+# Scala
+*.class
+*.tasty
