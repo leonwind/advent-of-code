@@ -1,5 +1,3 @@
-
-
 object Day08 extends App {
   //val input = io.Source.fromFile("small_input.txt").getLines().toList
   //val input = io.Source.fromFile("other_small.txt").getLines().toList
